@@ -1,4 +1,4 @@
-import 'package:admin/models/MyFiles.dart';
+import 'package:admin/models/StreamingDevices.dart';
 import 'package:admin/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -7,11 +7,11 @@ import '../../../constants.dart';
 import 'image_viewer_card.dart';
 
 class ImageViewers extends StatelessWidget {
-  final Function() ChangeScrollableSettigs;
+  final Function() changeScrollableSettigs;
 
   const ImageViewers({
     Key? key,
-    required this.ChangeScrollableSettigs,
+    required this.changeScrollableSettigs,
   }) : super(key: key);
 
   @override
@@ -20,23 +20,23 @@ class ImageViewers extends StatelessWidget {
     return Responsive(
       mobile: ImageViewersGridView(
         crossAxisCount: _size.width < 650 ? 1 : 2,
-        ChangeScrollableSettings: ChangeScrollableSettigs,
+        changeScrollableSettings: changeScrollableSettigs,
       ),
       tablet: ImageViewersGridView(
-          ChangeScrollableSettings: ChangeScrollableSettigs),
+          changeScrollableSettings: changeScrollableSettigs),
       desktop: ImageViewersGridView(
-          ChangeScrollableSettings: ChangeScrollableSettigs),
+          changeScrollableSettings: changeScrollableSettigs),
     );
   }
 }
 
 class ImageViewersGridView extends StatefulHookWidget {
-  final Function() ChangeScrollableSettings;
+  final Function() changeScrollableSettings;
   final int crossAxisCount;
 
   const ImageViewersGridView({
     Key? key,
-    required this.ChangeScrollableSettings,
+    required this.changeScrollableSettings,
     this.crossAxisCount = 2,
   }) : super(key: key);
 
@@ -45,29 +45,31 @@ class ImageViewersGridView extends StatefulHookWidget {
 }
 
 class _ImageViewersGridViewState extends State<ImageViewersGridView> {
-  List imageSources = demoMyFiles;
+  List imageSources = streamingDevices;
   bool expanded = false;
   int expandedIndex = -1;
 
   @override
   Widget build(BuildContext context) {
     if (expanded) {
-      return Row(
-        children: [
-          Expanded(
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          return Container(
+            height: constraints.maxWidth / 0.88,
+            width: constraints.maxWidth,
             child: ImageViewer(
               info: imageSources[expandedIndex],
               expanded: true,
-              ExpandCard: () {
+              expandCard: () {
                 setState(() {
                   this.expanded = false;
                   this.expandedIndex = -1;
                 });
               },
-              ChangeScrollableSettings: widget.ChangeScrollableSettings,
+              changeScrollableSettings: widget.changeScrollableSettings,
             ),
-          ),
-        ],
+          );
+        },
       );
     } else {
       return GridView.builder(
@@ -83,13 +85,13 @@ class _ImageViewersGridViewState extends State<ImageViewersGridView> {
         itemBuilder: (context, index) => ImageViewer(
           info: imageSources[index],
           expanded: false,
-          ExpandCard: () {
+          expandCard: () {
             setState(() {
               this.expanded = true;
               this.expandedIndex = index;
             });
           },
-          ChangeScrollableSettings: widget.ChangeScrollableSettings,
+          changeScrollableSettings: widget.changeScrollableSettings,
         ),
       );
     }

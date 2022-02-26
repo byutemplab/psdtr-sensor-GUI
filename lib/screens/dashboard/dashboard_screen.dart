@@ -36,7 +36,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   flex: 5,
                   child: Column(
                     children: [
-                      ImageViewers(ChangeScrollableSettigs: () {
+                      ImageViewers(changeScrollableSettigs: () {
                         setState(() {
                           mouseOverCard = !mouseOverCard;
                         });

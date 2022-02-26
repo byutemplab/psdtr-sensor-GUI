@@ -1,6 +1,6 @@
 // import 'dart:html';
 
-import 'package:admin/models/MyFiles.dart';
+import 'package:admin/models/StreamingDevices.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'interactive_stream.dart';
@@ -12,17 +12,17 @@ import 'package:http/http.dart' as http;
 import '../../../constants.dart';
 
 class ImageViewer extends StatefulHookWidget {
-  final CloudStorageInfo info;
+  final StreamingDevice info;
   final bool expanded;
-  final Function() ExpandCard;
-  final Function() ChangeScrollableSettings;
+  final Function() expandCard;
+  final Function() changeScrollableSettings;
 
   const ImageViewer({
     Key? key,
     required this.info,
     required this.expanded,
-    required this.ExpandCard,
-    required this.ChangeScrollableSettings,
+    required this.expandCard,
+    required this.changeScrollableSettings,
   }) : super(key: key);
 
   @override
@@ -46,13 +46,13 @@ class _ImageViewerState extends State<ImageViewer> {
           borderRadius: const BorderRadius.all(Radius.circular(10)),
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  widget.info.title!,
+                  widget.info.name!,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -98,49 +98,50 @@ class _ImageViewerState extends State<ImageViewer> {
                       minHeight: 18,
                       minWidth: 18,
                     ),
-                    onPressed: widget.ExpandCard,
+                    onPressed: widget.expandCard,
                   ),
                 ]),
               ],
             ),
             SizedBox(height: defaultPadding / 2),
-            Builder(builder: (context) {
-              return InteractiveViewer(
-                maxScale: 100,
-                child: MouseRegion(
-                  onEnter: (event) {
-                    setState(() => mouseOver = true);
-                    widget.ChangeScrollableSettings();
-                  },
-                  onExit: (event) {
-                    setState(() => mouseOver = false);
-                    widget.ChangeScrollableSettings();
-                  },
-                  onHover: (event) => setState(() {
-                    xCoord = event.localPosition.dx / context.size!.width;
-                    yCoord = event.localPosition.dy / context.size!.height;
-                  }),
-                  cursor: SystemMouseCursors.precise,
-                  child: Stack(
-                    children: [
-                      Mjpeg(
-                        isLive: isRunning.value,
-                        error: (context, error, stack) {
-                          print(error);
-                          print(stack);
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        },
-                        stream: 'http://localhost/${widget.info.streamUrl!}',
-                      ),
-                      if (alignmentBoxVisible)
-                        AlignmentBox(alignmentSettingPath: "cmos-camera-marks"),
-                    ],
+            Expanded(
+              child: Builder(builder: (context) {
+                return InteractiveViewer(
+                  maxScale: 100,
+                  child: MouseRegion(
+                    onEnter: (event) {
+                      setState(() => mouseOver = true);
+                      widget.changeScrollableSettings();
+                    },
+                    onExit: (event) {
+                      setState(() => mouseOver = false);
+                      widget.changeScrollableSettings();
+                    },
+                    onHover: (event) => setState(() {
+                      xCoord = event.localPosition.dx / context.size!.width;
+                      yCoord = event.localPosition.dy / context.size!.height;
+                    }),
+                    cursor: SystemMouseCursors.precise,
+                    child: Stack(
+                      children: [
+                        Mjpeg(
+                          isLive: isRunning.value,
+                          error: (context, error, stack) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          },
+                          stream: 'http://localhost/${widget.info.streamUrl!}',
+                        ),
+                        if (alignmentBoxVisible)
+                          AlignmentBox(
+                              alignmentSettingPath: "cmos-camera-marks"),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            }),
+                );
+              }),
+            ),
           ],
         ),
       ),
