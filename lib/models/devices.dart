@@ -3,22 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class Device {
-  final int id;
   final String name;
+  final String description;
   final bool connected;
   final String deviceType;
 
   const Device({
-    required this.id,
     required this.name,
+    required this.description,
     required this.connected,
     required this.deviceType,
   });
 
   factory Device.fromJson(Map<String, dynamic> device) {
     return Device(
-      id: device['id'],
       name: device['name'],
+      description: device['description'],
       connected: device['connected'],
       deviceType: device['device_type'],
     );
@@ -30,8 +30,8 @@ Future<List<Device>> fetchDevices() async {
 
   if (response.statusCode == 200) {
     List<Device> devices = [];
-    final json = jsonDecode(response.body)['data'];
-    for (var device in json.values) {
+    final _devices = json.decode(response.body)['data'];
+    for (var device in _devices) {
       devices.add(Device.fromJson(device));
     }
     return devices;

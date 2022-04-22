@@ -1,4 +1,4 @@
-import 'package:admin/models/StreamingDevices.dart';
+import 'package:admin/models/streaming_devices.dart';
 import 'package:admin/responsive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';

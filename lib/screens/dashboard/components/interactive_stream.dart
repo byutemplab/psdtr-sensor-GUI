@@ -104,22 +104,20 @@ class Mjpeg extends HookWidget {
 
     return Container(
       width: double.infinity,
-      child: FittedBox(
-        child: VisibilityDetector(
-          key: key,
-          child: Image(
-            image: image.value!,
-            width: width,
-            height: height,
-            gaplessPlayback: true,
-            fit: fit,
-          ),
-          onVisibilityChanged: (VisibilityInfo info) {
-            if (visible.mounted) {
-              visible.visible = info.visibleFraction != 0;
-            }
-          },
+      child: VisibilityDetector(
+        key: key,
+        child: Image(
+          image: image.value!,
+          width: width,
+          height: height,
+          gaplessPlayback: true,
+          fit: fit,
         ),
+        onVisibilityChanged: (VisibilityInfo info) {
+          if (visible.mounted) {
+            visible.visible = info.visibleFraction != 0;
+          }
+        },
       ),
     );
   }

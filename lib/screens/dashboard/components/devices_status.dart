@@ -16,13 +16,15 @@ class DevicesStatus extends StatefulWidget {
 }
 
 class _DevicesStatusState extends State<DevicesStatus> {
-  late Future<List<Device>> futureDevices;
+  late Future<List<Device>> futureDevices = fetchDevices();
 
   setUpTimedFetch() {
     Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() {
-        futureDevices = fetchDevices();
-      });
+      if (this.mounted) {
+        setState(() {
+          futureDevices = fetchDevices();
+        });
+      }
     });
   }
 
@@ -56,13 +58,14 @@ class _DevicesStatusState extends State<DevicesStatus> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return Column(
-                  children: snapshot.data!.map((device) {
-                    return DeviceInfoCard(
-                      icon: getDeviceIcon(device.name),
-                      name: device.name,
-                      connected: device.connected,
-                    );
-                  }).toList(),
+                  children: snapshot.data?.map((device) {
+                        return DeviceInfoCard(
+                          icon: getDeviceIcon(device.description),
+                          name: device.description,
+                          connected: device.connected,
+                        );
+                      }).toList() ??
+                      [],
                 );
               } else {
                 return Center(
