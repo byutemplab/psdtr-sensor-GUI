@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class SideMenu extends StatelessWidget {
+  final Function changePage;
   const SideMenu({
+    required this.changePage,
     Key? key,
   }) : super(key: key);
 
@@ -28,17 +30,23 @@ class SideMenu extends StatelessWidget {
           DrawerListTile(
             title: "Dashboard",
             svgSrc: "assets/icons/menu_dashbord.svg",
-            press: () {},
+            press: () {
+              changePage("Dashboard");
+            },
           ),
           DrawerListTile(
-            title: "Analysis",
+            title: "Trajectories Viewer",
             svgSrc: "assets/icons/menu_tran.svg",
-            press: () {},
+            press: () {
+              changePage("TrajectoriesViewer");
+            },
           ),
           DrawerListTile(
             title: "Tasks",
             svgSrc: "assets/icons/menu_task.svg",
-            press: () {},
+            press: () {
+              changePage("Tasks");
+            },
           ),
           // DrawerListTile(
           //   title: "Documents",
@@ -63,7 +71,9 @@ class SideMenu extends StatelessWidget {
           DrawerListTile(
             title: "Settings",
             svgSrc: "assets/icons/menu_setting.svg",
-            press: () {},
+            press: () {
+              changePage("Settings");
+            },
           ),
         ],
       ),

@@ -1,5 +1,4 @@
 import 'package:admin/responsive.dart';
-import 'package:admin/screens/dashboard/components/image_viewers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -8,6 +7,7 @@ import 'components/header.dart';
 
 // import 'components/recent_files.dart';
 import 'components/devices_status.dart';
+import 'components/image_viewers.dart';
 
 class DashboardScreen extends StatefulHookWidget {
   @override
