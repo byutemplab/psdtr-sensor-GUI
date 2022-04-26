@@ -103,7 +103,7 @@ class Mjpeg extends HookWidget {
     }
 
     return Container(
-      width: double.infinity,
+      height: height,
       child: VisibilityDetector(
         key: key,
         child: Image(

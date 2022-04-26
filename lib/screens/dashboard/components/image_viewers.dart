@@ -7,11 +7,11 @@ import '../../../constants.dart';
 import 'image_viewer_card.dart';
 
 class ImageViewers extends StatelessWidget {
-  final Function() changeScrollableSettigs;
+  final Function() changeScrollableSettings;
 
   const ImageViewers({
     Key? key,
-    required this.changeScrollableSettigs,
+    required this.changeScrollableSettings,
   }) : super(key: key);
 
   @override
@@ -20,12 +20,12 @@ class ImageViewers extends StatelessWidget {
     return Responsive(
       mobile: ImageViewersGridView(
         crossAxisCount: _size.width < 650 ? 1 : 2,
-        changeScrollableSettings: changeScrollableSettigs,
+        changeScrollableSettings: changeScrollableSettings,
       ),
       tablet: ImageViewersGridView(
-          changeScrollableSettings: changeScrollableSettigs),
+          changeScrollableSettings: changeScrollableSettings),
       desktop: ImageViewersGridView(
-          changeScrollableSettings: changeScrollableSettigs),
+          changeScrollableSettings: changeScrollableSettings),
     );
   }
 }
