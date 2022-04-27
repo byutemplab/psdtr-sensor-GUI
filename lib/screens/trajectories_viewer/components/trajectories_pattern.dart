@@ -17,6 +17,10 @@ class _TrajectoriesPatternState extends State<TrajectoriesPattern> {
   TrajectoriesSetting pattern = TrajectoriesSetting();
   int selectedTrajectory = -1;
   int hoveredTrajectory = -1;
+  bool hoveringStart = false;
+  bool selectedStart = false;
+  bool hoveringCenter = false;
+  bool selectedCenter = false;
 
   @override
   void initState() {
@@ -26,10 +30,21 @@ class _TrajectoriesPatternState extends State<TrajectoriesPattern> {
     });
   }
 
+  bool checkIfHoveringPoint(Offset point, Offset pos, double offset) {
+    // check if pos is within radius of start
+    final dx = point.dx - pos.dx;
+    final dy = point.dy - pos.dy;
+    return (dx * dx + dy * dy < offset * offset);
+  }
+
   void checkIfHoveringTrajectory(Offset pos) {
     for (int i = 0; i < pattern.trajectories.length; i++) {
       final start = pattern.trajectories[i].start;
       final end = pattern.trajectories[i].end;
+      final center = Offset(
+        (start.dx + end.dx) / 2,
+        (start.dy + end.dy) / 2,
+      );
       final offset = 0.05;
       // get bounding box
       final minX = min(start.dx, end.dx) - offset;
@@ -48,11 +63,30 @@ class _TrajectoriesPatternState extends State<TrajectoriesPattern> {
           ((pos.dy > pos.dx * slope + intercept - yOffset &&
                   pos.dy < pos.dx * slope + intercept + yOffset) ||
               (start.dx == end.dx))) {
-        setState(() => hoveredTrajectory = i);
+        setState(() => {
+              hoveredTrajectory = i,
+              hoveringStart = checkIfHoveringPoint(
+                start,
+                pos,
+                offset,
+              ),
+              hoveringCenter = checkIfHoveringPoint(
+                center,
+                pos,
+                offset,
+              ),
+            });
+
         return;
       }
     }
-    setState(() => hoveredTrajectory = -1);
+
+    // release hover
+    setState(() => {
+          hoveredTrajectory = -1,
+          hoveringStart = false,
+          hoveringCenter = false
+        });
   }
 
   void selectTrajectory(Offset click) {
@@ -107,6 +141,47 @@ class _TrajectoriesPatternState extends State<TrajectoriesPattern> {
     });
   }
 
+  void updateTrajectoryStart(Offset newStart) {
+    if (selectedTrajectory == -1) return;
+    // Compute new end point according to start and center
+    final start = pattern.trajectories[selectedTrajectory].start;
+    final end = pattern.trajectories[selectedTrajectory].end;
+    Offset center = Offset(
+      (start.dx + end.dx) / 2,
+      (start.dy + end.dy) / 2,
+    );
+    Offset newEnd = Offset(
+      (center.dx - newStart.dx) + center.dx,
+      (center.dy - newStart.dy) + center.dy,
+    );
+    // Don't allow trajectory to go off screen
+    if (newStart.dx < 0 ||
+        newStart.dx > 1 ||
+        newStart.dy < 0 ||
+        newStart.dy > 1 ||
+        newEnd.dx < 0 ||
+        newEnd.dx > 1 ||
+        newEnd.dy < 0 ||
+        newEnd.dy > 1) {
+      return;
+    }
+
+    // Round coordinates to the nearest 0.0001
+    newStart = Offset(
+      (newStart.dx * 10000).round() / 10000,
+      (newStart.dy * 10000).round() / 10000,
+    );
+    newEnd = Offset(
+      (newEnd.dx * 10000).round() / 10000,
+      (newEnd.dy * 10000).round() / 10000,
+    );
+
+    setState(() {
+      pattern.trajectories[selectedTrajectory].start = newStart;
+      pattern.trajectories[selectedTrajectory].end = newEnd;
+    });
+  }
+
   void updateTrajectoryInServer() {
     if (selectedTrajectory == -1) return;
     // POST request to update server
@@ -132,11 +207,19 @@ class _TrajectoriesPatternState extends State<TrajectoriesPattern> {
         // Update corner
         onPanUpdate: (event) {
           Offset pos = event.localPosition / sideLength;
-          updateTrajectoryCenter(pos);
+          if (hoveringStart) {
+            updateTrajectoryStart(pos);
+          } else if (hoveringCenter) {
+            updateTrajectoryCenter(pos);
+          }
         },
         onLongPressMoveUpdate: (event) {
           Offset pos = event.localPosition / sideLength;
-          updateTrajectoryCenter(pos);
+          if (hoveringStart) {
+            updateTrajectoryStart(pos);
+          } else if (hoveringCenter) {
+            updateTrajectoryCenter(pos);
+          }
         },
         // Release corner
         onPanEnd: (event) {
@@ -160,6 +243,8 @@ class _TrajectoriesPatternState extends State<TrajectoriesPattern> {
                 sideLength: sideLength,
                 selectedTrajectory: selectedTrajectory,
                 hoveredTrajectory: hoveredTrajectory,
+                hoveringStart: hoveringStart,
+                hoveringCenter: hoveringCenter,
               ),
             ),
           ),
@@ -174,6 +259,8 @@ class PatternPainter extends CustomPainter {
   final double sideLength;
   final int selectedTrajectory;
   final int hoveredTrajectory;
+  final bool hoveringStart;
+  final bool hoveringCenter;
   final double pixelRatio;
 
   PatternPainter({
@@ -181,6 +268,8 @@ class PatternPainter extends CustomPainter {
     required this.sideLength,
     required this.selectedTrajectory,
     required this.hoveredTrajectory,
+    required this.hoveringStart,
+    required this.hoveringCenter,
     this.pixelRatio = 0.5, // 1 sem image pixel = 1 projector pixel
   });
 
@@ -219,7 +308,7 @@ class PatternPainter extends CustomPainter {
       List<Offset> greenPoints =
           interpolatePoints(start, end, pattern.numberOfMeasurements);
       for (var j = 0; j < greenPoints.length; j++) {
-        if (i == hoveredTrajectory) {
+        if (i == hoveredTrajectory && hoveringStart) {
           canvas.drawCircle(greenPoints[j],
               pattern.greenPointDiameter * pixelRatio, greenPointSelectedPaint);
         } else {
@@ -228,7 +317,7 @@ class PatternPainter extends CustomPainter {
         }
       }
       Offset laserPoint = getCenter(start, end);
-      if (i == hoveredTrajectory) {
+      if (i == hoveredTrajectory && hoveringCenter) {
         canvas.drawCircle(laserPoint, pattern.laserPointDiameter * pixelRatio,
             laserPointSelectedPaint);
       } else {
