@@ -45,11 +45,12 @@ class TrajectoriesSetting {
     }
     return TrajectoriesSetting(
       name: json['name'],
-      numberOfMeasurements: int.parse(json['number-of-measurements']),
-      measurementTime: int.parse(json['measurement-time']),
+      numberOfMeasurements:
+          int.parse(json['number-of-measurements'].toString()),
+      measurementTime: int.parse(json['measurement-time'].toString()),
       measurementTimeUnit: json['measurement-time-unit'],
-      greenPointDiameter: int.parse(json['green-point-diameter']),
-      laserPointDiameter: int.parse(json['laser-point-diameter']),
+      greenPointDiameter: int.parse(json['green-point-diameter'].toString()),
+      laserPointDiameter: int.parse(json['laser-point-diameter'].toString()),
       trajectories: trajectories,
     );
   }
