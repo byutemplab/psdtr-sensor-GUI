@@ -3,6 +3,8 @@ import '../../../constants.dart';
 import 'package:flutter_spinbox/material.dart';
 import 'package:admin/models/trajectories_settings.dart';
 
+import 'package:http/http.dart' as http;
+
 class TrajectoriesSettingsCard extends StatefulWidget {
   final TrajectoriesSetting pattern;
   final Function(double) updateNumberOfMeasurements;
@@ -28,6 +30,17 @@ class _TrajectoriesSettingsCardState extends State<TrajectoriesSettingsCard> {
   @override
   void initState() {
     super.initState();
+  }
+
+  void setPattern() async {
+    final response = await http.post(Uri.parse(
+        'http://localhost/green-projector/set-pattern/${widget.pattern.name}'));
+
+    if (response.statusCode == 200) {
+      print('Pattern set');
+    } else {
+      throw Exception('Failed to set pattern');
+    }
   }
 
   @override
@@ -115,11 +128,9 @@ class _TrajectoriesSettingsCardState extends State<TrajectoriesSettingsCard> {
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all(defaultColor),
               ),
-              onPressed: () {
-                // Respond to button press
-              },
+              onPressed: setPattern,
               icon: Icon(Icons.send_rounded, color: Colors.white),
-              label: Text('Send Pattern'),
+              label: Text('Set Pattern'),
             ),
           )
         ],

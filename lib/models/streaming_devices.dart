@@ -20,7 +20,7 @@ List streamingDevices = [
       AlignmentSetting(
         name: "SEM Image Marks",
         streamUrl: 'alignment-setting/sem-image-marks',
-        color: Colors.red,
+        color: Colors.grey,
         visible: true,
       ),
     ],
@@ -43,7 +43,7 @@ List streamingDevices = [
         AlignmentSetting(
           name: "CMOS Camera Marks",
           streamUrl: 'alignment-setting/cmos-camera-marks',
-          color: Colors.red,
+          color: Colors.grey,
           visible: true,
         ),
         AlignmentSetting(

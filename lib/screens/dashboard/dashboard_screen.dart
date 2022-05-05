@@ -8,6 +8,7 @@ import 'components/header.dart';
 // import 'components/recent_files.dart';
 import 'components/devices_status.dart';
 import 'components/image_viewers.dart';
+import 'components/projector_box_card.dart';
 
 class DashboardScreen extends StatefulHookWidget {
   @override
@@ -33,7 +34,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  flex: 5,
+                  flex: 3,
                   child: Column(
                     children: [
                       ImageViewers(changeScrollableSettings: () {
@@ -41,6 +42,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           mouseOverCard = !mouseOverCard;
                         });
                       }),
+                      if (Responsive.isMobile(context))
+                        SizedBox(height: defaultPadding),
+                      if (Responsive.isMobile(context)) ProjectorBoxCard(),
                       if (Responsive.isMobile(context))
                         SizedBox(height: defaultPadding),
                       if (Responsive.isMobile(context)) DevicesStatus(),
@@ -52,7 +56,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 if (!Responsive.isMobile(context))
                   Expanded(
                     flex: 2,
-                    child: DevicesStatus(),
+                    child: Column(
+                      children: [
+                        ProjectorBoxCard(),
+                        SizedBox(height: defaultPadding),
+                        DevicesStatus(),
+                      ],
+                    ),
                   ),
               ],
             )

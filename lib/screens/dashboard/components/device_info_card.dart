@@ -28,7 +28,7 @@ class DeviceInfoCard extends StatelessWidget {
       child: Row(
         children: [
           SizedBox(
-            height: 20,
+            height: 25,
             width: 20,
             child: Icon(icon),
           ),
@@ -43,17 +43,18 @@ class DeviceInfoCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  Text(
-                    connected ? 'CONNECTED' : 'DISCONNECTED',
-                    style: Theme.of(context)
-                        .textTheme
-                        .caption!
-                        .copyWith(color: Colors.white70),
-                  ),
                 ],
               ),
             ),
           ),
+          Text(
+            connected ? 'CONNECTED' : 'DISCONNECTED',
+            style: Theme.of(context)
+                .textTheme
+                .caption!
+                .copyWith(color: Colors.white70),
+          ),
+          SizedBox(width: defaultPadding),
           Icon(Icons.circle,
               size: 20, color: connected ? Colors.green : Colors.grey),
         ],

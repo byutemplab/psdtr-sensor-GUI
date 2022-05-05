@@ -33,14 +33,6 @@ Future<List<Offset>> fetchAlignmentBoxCorners(streamUrl) async {
   } else {
     throw Exception('Failed to load alignment setting from $streamUrl');
   }
-  // List<Offset> corners = [
-  //   Offset(0.0, 0.0),
-  //   Offset(0.0, 0.0),
-  //   Offset(0.0, 0.0),
-  //   Offset(0.0, 0.0),
-  // ];
-
-  // return corners;
 }
 
 void updateAlignmentBoxCorners(streamUrl, corners, selectedCorner) async {

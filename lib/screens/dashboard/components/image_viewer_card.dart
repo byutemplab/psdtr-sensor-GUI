@@ -52,9 +52,14 @@ class _ImageViewerState extends State<ImageViewer> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 if (mouseOver)
-                  Text(
-                      "x=${xCoord.toStringAsFixed(4)}, y=${yCoord.toStringAsFixed(4)}",
-                      style: TextStyle(fontSize: 10)),
+                  Column(
+                    children: [
+                      Text("x=${xCoord.toStringAsFixed(4)}",
+                          style: TextStyle(fontSize: 10)),
+                      Text("y=${yCoord.toStringAsFixed(4)}",
+                          style: TextStyle(fontSize: 10)),
+                    ],
+                  ),
                 Row(children: [
                   ToggleButtons(
                     children:

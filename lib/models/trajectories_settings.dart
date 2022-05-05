@@ -62,7 +62,6 @@ Future<TrajectoriesSetting> fetchTrajectoriesSetting() async {
   final response = await http.get(Uri.parse('http://localhost/trajectories'));
 
   if (response.statusCode == 200) {
-    print(json.decode(response.body)['data'][0]);
     return TrajectoriesSetting.fromJson(json.decode(response.body)['data'][0]);
   } else {
     throw Exception('Failed to load trajectories setting');
