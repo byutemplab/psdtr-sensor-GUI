@@ -3,17 +3,21 @@ import 'dart:math';
 import 'package:admin/models/trajectories_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:context_menus/context_menus.dart';
 
-class TrajectoriesPattern extends StatefulHookWidget {
-  const TrajectoriesPattern({
+class TrajectoriesPatternEditor extends StatefulHookWidget {
+  final pattern;
+  TrajectoriesPatternEditor({
+    required this.pattern,
     Key? key,
   }) : super(key: key);
 
   @override
-  _TrajectoriesPatternState createState() => _TrajectoriesPatternState();
+  _TrajectoriesPatternEditorState createState() =>
+      _TrajectoriesPatternEditorState();
 }
 
-class _TrajectoriesPatternState extends State<TrajectoriesPattern> {
+class _TrajectoriesPatternEditorState extends State<TrajectoriesPatternEditor> {
   TrajectoriesSetting pattern = TrajectoriesSetting();
   int selectedTrajectory = -1;
   int hoveredTrajectory = -1;
@@ -21,13 +25,11 @@ class _TrajectoriesPatternState extends State<TrajectoriesPattern> {
   bool selectedStart = false;
   bool hoveringCenter = false;
   bool selectedCenter = false;
+  Offset hoveringPosition = Offset.zero;
 
   @override
   void initState() {
     super.initState();
-    fetchTrajectoriesSetting().then((value) {
-      setState(() => pattern = value);
-    });
   }
 
   bool checkIfHoveringPoint(Offset point, Offset pos, double offset) {
@@ -182,69 +184,131 @@ class _TrajectoriesPatternState extends State<TrajectoriesPattern> {
     });
   }
 
-  void updateTrajectoryInServer() {
-    if (selectedTrajectory == -1) return;
-    // POST request to update server
-    updateTrajectory("Trajectory Setting demo", selectedTrajectory, pattern);
-    // Release trajectory
-    selectedTrajectory = -1;
+  void _removeTrajectory() {
+    if (hoveredTrajectory == -1) return;
+    setState(() {
+      pattern.trajectories.removeAt(hoveredTrajectory);
+      hoveredTrajectory = -1;
+    });
+  }
+
+  void _addNewTrajectory() {
+    // Create new trajectory
+    final newTrajectory = Trajectory(
+      start: Offset(hoveringPosition.dx, hoveringPosition.dy),
+      end: Offset(hoveringPosition.dx, hoveringPosition.dy),
+    );
+
+    // Add new trajectory to pattern and auto select it
+    setState(() {
+      pattern.trajectories.add(newTrajectory);
+      selectedTrajectory = pattern.trajectories.length - 1;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    setState(() {
+      pattern = widget.pattern;
+    });
     return LayoutBuilder(builder: (context, constraints) {
       double sideLength = constraints.maxHeight;
-      return GestureDetector(
-        // Start dragging on corner
-        onTapDown: (event) {
-          Offset pos = event.localPosition / sideLength;
-          selectTrajectory(pos);
-        },
-        onPanStart: (event) {
-          Offset pos = event.localPosition / sideLength;
-          selectTrajectory(pos);
-        },
-        // Update corner
-        onPanUpdate: (event) {
-          Offset pos = event.localPosition / sideLength;
-          if (hoveringStart) {
-            updateTrajectoryStart(pos);
-          } else if (hoveringCenter) {
-            updateTrajectoryCenter(pos);
-          }
-        },
-        onLongPressMoveUpdate: (event) {
-          Offset pos = event.localPosition / sideLength;
-          if (hoveringStart) {
-            updateTrajectoryStart(pos);
-          } else if (hoveringCenter) {
-            updateTrajectoryCenter(pos);
-          }
-        },
-        // Release corner
-        onPanEnd: (event) {
-          updateTrajectoryInServer();
-        },
-        onLongPressUp: () {
-          updateTrajectoryInServer();
-        },
-        child: MouseRegion(
-          // When the mouse enters the region, set the hoveredTrajectory
-          onHover: (event) {
+      return ContextMenuRegion(
+        contextMenu: GenericContextMenu(
+          buttonConfigs: hoveredTrajectory == -1
+              ? [
+                  ContextMenuButtonConfig(
+                    "Add trajectory",
+                    icon: Icon(Icons.add, size: 18),
+                    onPressed: () {
+                      _addNewTrajectory();
+                    },
+                  )
+                ]
+              : [
+                  ContextMenuButtonConfig(
+                    "Remove Trajectory",
+                    icon: Icon(Icons.remove, size: 18),
+                    onPressed: () {
+                      removeTrajectory(
+                          "Trajectory Setting demo", hoveredTrajectory);
+                      _removeTrajectory();
+                    },
+                  ),
+                ],
+        ),
+        child: GestureDetector(
+          // Start dragging on corner
+          onTapDown: (event) {
             Offset pos = event.localPosition / sideLength;
-            checkIfHoveringTrajectory(pos);
+            selectTrajectory(pos);
           },
-          child: Container(
-            width: sideLength,
-            height: sideLength,
-            child: CustomPaint(
-              painter: PatternPainter(
-                pattern: pattern,
-                sideLength: sideLength,
-                selectedTrajectory: selectedTrajectory,
-                hoveredTrajectory: hoveredTrajectory,
-                hoveringStart: hoveringStart,
-                hoveringCenter: hoveringCenter,
+          onPanStart: (event) {
+            Offset pos = event.localPosition / sideLength;
+            selectTrajectory(pos);
+          },
+          // Update corner
+          onPanUpdate: (event) {
+            Offset pos = event.localPosition / sideLength;
+            if (hoveringStart) {
+              updateTrajectoryStart(pos);
+            } else if (hoveringCenter) {
+              updateTrajectoryCenter(pos);
+            }
+          },
+          onLongPressMoveUpdate: (event) {
+            Offset pos = event.localPosition / sideLength;
+            if (hoveringStart) {
+              updateTrajectoryStart(pos);
+            } else if (hoveringCenter) {
+              updateTrajectoryCenter(pos);
+            }
+          },
+          // Release corner
+          onPanEnd: (event) {
+            updateTrajectory(
+                "Trajectory Setting demo", selectedTrajectory, pattern);
+            // Release trajectory
+            selectedTrajectory = -1;
+          },
+          onLongPressUp: () {
+            updateTrajectory(
+                "Trajectory Setting demo", selectedTrajectory, pattern);
+            // Release trajectory
+            selectedTrajectory = -1;
+          },
+          onTap: () {
+            addTrajectory("Trajectory Setting demo", pattern);
+            // Release trajectory
+            selectedTrajectory = -1;
+          },
+          child: MouseRegion(
+            // When the mouse enters the region, set the hoveredTrajectory
+            onHover: (event) {
+              // Update position
+              Offset pos = event.localPosition / sideLength;
+              setState(() {
+                hoveringPosition = pos;
+              });
+
+              // Update hovered trajectory
+              checkIfHoveringTrajectory(pos);
+
+              // If creating a new trajectory, set the start point
+              updateTrajectoryStart(pos);
+            },
+            child: Container(
+              width: sideLength,
+              height: sideLength,
+              child: CustomPaint(
+                painter: PatternPainter(
+                  pattern: pattern,
+                  sideLength: sideLength,
+                  selectedTrajectory: selectedTrajectory,
+                  hoveredTrajectory: hoveredTrajectory,
+                  hoveringStart: hoveringStart,
+                  hoveringCenter: hoveringCenter,
+                ),
               ),
             ),
           ),
@@ -273,11 +337,11 @@ class PatternPainter extends CustomPainter {
     this.pixelRatio = 0.5, // 1 sem image pixel = 1 projector pixel
   });
 
-  List<Offset> interpolatePoints(Offset start, Offset end, int numPoints) {
+  List<Offset> interpolatePoints(Offset start, Offset end, double numPoints) {
     List<Offset> points = [];
     double dx = (end.dx - start.dx) / (numPoints - 1);
     double dy = (end.dy - start.dy) / (numPoints - 1);
-    for (int i = 0; i < numPoints; i++) {
+    for (double i = 0; i < numPoints; i++) {
       points.add(Offset(start.dx + dx * i, start.dy + dy * i));
     }
     return points;
