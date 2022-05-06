@@ -28,14 +28,14 @@ class SideMenu extends StatelessWidget {
             ),
           ),
           DrawerListTile(
-            title: "Dashboard",
+            title: "Alignment",
             svgSrc: "assets/icons/menu_dashbord.svg",
             press: () {
-              changePage("Dashboard");
+              changePage("Alignment");
             },
           ),
           DrawerListTile(
-            title: "Trajectories Viewer",
+            title: "Trajectories",
             svgSrc: "assets/icons/menu_tran.svg",
             press: () {
               changePage("TrajectoriesViewer");

@@ -19,7 +19,7 @@ class Header extends StatelessWidget {
           ),
         if (!Responsive.isMobile(context))
           Text(
-            "Trajectories Viewer",
+            "Trajectories",
             style: Theme.of(context).textTheme.headline6,
           ),
         if (!Responsive.isMobile(context))

@@ -6,12 +6,14 @@ class Device {
   final String name;
   final String description;
   final bool connected;
+  final String connectionType;
   final String deviceType;
 
   const Device({
     required this.name,
     required this.description,
     required this.connected,
+    required this.connectionType,
     required this.deviceType,
   });
 
@@ -20,6 +22,7 @@ class Device {
       name: device['name'],
       description: device['description'],
       connected: device['connected'],
+      connectionType: device['connection_type'],
       deviceType: device['device_type'],
     );
   }
@@ -54,5 +57,25 @@ IconData getDeviceIcon(String device) {
       return Icons.camera;
     default:
       return Icons.control_camera;
+  }
+}
+
+class CMOSCameraSettings {
+  double exposure;
+  double gain;
+  double brightness;
+
+  CMOSCameraSettings({
+    this.exposure = 0.0,
+    this.gain = 0.0,
+    this.brightness = 0.0,
+  });
+
+  factory CMOSCameraSettings.fromJson(Map<String, dynamic> settings) {
+    return CMOSCameraSettings(
+      exposure: settings['exposure'].toDouble(),
+      gain: settings['gain'].toDouble(),
+      brightness: settings['brightness'].toDouble(),
+    );
   }
 }

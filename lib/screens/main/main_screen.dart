@@ -13,7 +13,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  String _selectedPage = "Dashboard";
+  String _selectedPage = "Alignment";
 
   void changePage(String selectedPage) {
     setState(() {
@@ -40,7 +40,7 @@ class _MainScreenState extends State<MainScreen> {
             Expanded(
               // It takes 5/6 part of the screen
               flex: 5,
-              child: _selectedPage == "Dashboard"
+              child: _selectedPage == "Alignment"
                   ? DashboardScreen()
                   : TrajectoriesViewerScreen(),
             ),

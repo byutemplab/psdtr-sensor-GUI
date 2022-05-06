@@ -9,6 +9,7 @@ import 'components/header.dart';
 import 'components/devices_status.dart';
 import 'components/image_viewers.dart';
 import 'components/projector_box_card.dart';
+import 'components/cmos_camera_settings_card.dart';
 
 class DashboardScreen extends StatefulHookWidget {
   @override
@@ -34,7 +35,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  flex: 3,
+                  flex: 4,
                   child: Column(
                     children: [
                       ImageViewers(changeScrollableSettings: () {
@@ -48,6 +49,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       if (Responsive.isMobile(context))
                         SizedBox(height: defaultPadding),
                       if (Responsive.isMobile(context)) DevicesStatus(),
+                      if (Responsive.isMobile(context))
+                        SizedBox(height: defaultPadding),
+                      if (Responsive.isMobile(context))
+                        CMOSCameraSettingsCard(),
                     ],
                   ),
                 ),
@@ -61,6 +66,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ProjectorBoxCard(),
                         SizedBox(height: defaultPadding),
                         DevicesStatus(),
+                        SizedBox(height: defaultPadding),
+                        CMOSCameraSettingsCard(),
                       ],
                     ),
                   ),

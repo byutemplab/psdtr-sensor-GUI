@@ -58,14 +58,21 @@ class _DevicesStatusState extends State<DevicesStatus> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return Column(
-                  children: snapshot.data?.map((device) {
-                        return DeviceInfoCard(
-                          icon: getDeviceIcon(device.description),
-                          name: device.description,
-                          connected: device.connected,
-                        );
-                      }).toList() ??
-                      [],
+                  children: [
+                    SizedBox(height: defaultPadding),
+                    Column(
+                      children: snapshot.data?.map((device) {
+                            return DeviceInfoCard(
+                              icon: getDeviceIcon(device.description),
+                              name: device.name,
+                              description: device.description,
+                              connected: device.connected,
+                              connectionType: device.connectionType,
+                            );
+                          }).toList() ??
+                          [],
+                    ),
+                  ],
                 );
               } else {
                 return Center(
